@@ -10,6 +10,19 @@ from urllib import robotparser
 from bs4 import BeautifulSoup, ResultSet
 from typing import Optional
 
+HEADER = """
+ @@@@@@   @@@@@@@   @@@  @@@@@@@   @@@@@@@@  @@@@@@@   
+@@@@@@@   @@@@@@@@  @@@  @@@@@@@@  @@@@@@@@  @@@@@@@@  
+!@@       @@!  @@@  @@!  @@!  @@@  @@!       @@!  @@@  
+!@!       !@!  @!@  !@!  !@!  @!@  !@!       !@!  @!@  
+!!@@!!    @!@@!@!   !!@  @!@  !@!  @!!!:!    @!@!!@!   
+ !!@!!!   !!@!!!    !!!  !@!  !!!  !!!!!:    !!@!@!    
+     !:!  !!:       !!:  !!:  !!!  !!:       !!: :!!   
+    !:!   :!:       :!:  :!:  !:!  :!:       :!:  !:!  
+:::: ::    ::        ::   :::: ::   :: ::::  ::   :::  
+:: : :     :        :    :: :  :   : :: ::    :   : :  
+                                                       
+"""
 
 DEFAULT_DEPTH = 5
 DEFAULT_PATH = "./data"
@@ -293,9 +306,13 @@ def spider(args: argparse.Namespace) -> None:
         print_result(args)
 
 
-# parse arguments
-# check url and permissions
+def print_header() -> None:
+    for line in HEADER.splitlines():
+        print(color.HEADER + "{:^70}".format(line) + color.RESET)
+
+
 def main() -> None:
+    print_header()
     args: argparse.Namespace = parse_args()
     print_args(args)
     spider(args)
