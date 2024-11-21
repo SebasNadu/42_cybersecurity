@@ -6,7 +6,6 @@ import time
 import hashlib
 import base64
 import hmac
-from cryptography.fernet import Fernet
 # import qrcode
 # import struct
 
@@ -91,7 +90,7 @@ def generate_opt(key_file):
         try:
             with open(key_file, 'r') as file:
                 secret = file.read()
-            secret_decoded = base64.b32decode(secret, casefold=True)
+            secret_decoded = base64.b32decode(secret)
 
             timestamp = time.time()
             N = int(timestamp // time_step)
