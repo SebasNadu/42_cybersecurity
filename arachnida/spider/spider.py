@@ -7,7 +7,7 @@ import requests
 from urllib.parse import urljoin, urlparse
 from urllib import robotparser
 from bs4 import BeautifulSoup
-from typing import Optional, Set
+from typing import Set
 from tqdm import tqdm  # For progress visualization
 
 # Constants
@@ -58,7 +58,7 @@ def parse_arguments() -> argparse.Namespace:
         "-r", "--recursive", action="store_true", help="Recursively download images"
     )
     parser.add_argument(
-        "-l", "--level", type=int, help="Max depth for recursive search (default 5)"
+        "-l", "--level", default=5, type=int, help="Max depth for recursive search (default 5)"
     )
     parser.add_argument(
         "-p",
@@ -77,8 +77,8 @@ def validate_url(url: str) -> str:
     """Ensure URL is valid and has a scheme."""
     parsed = urlparse(url)
     if not parsed.scheme:
-        url = f"http://{url}"
-    parsed = urlparse(url)  # Re-parse after adding scheme
+        url = f"https://{url}"
+    parsed = urlparse(url)
     if not parsed.netloc:
         raise ValueError("Invalid URL: Missing domain or IP address.")
     return url
@@ -97,12 +97,9 @@ def check_robots_txt(url: str) -> None:
     robots_url = f"{base_url}/robots.txt"
     parser = robotparser.RobotFileParser()
     parser.set_url(robots_url)
-    try:
-        parser.read()
-        if not parser.can_fetch(USER_AGENT, url):
-            raise PermissionError(f"Access to {url} is disallowed by robots.txt")
-    except Exception as e:
-        print(f"{Color.WARNING}Warning: Unable to read robots.txt: {e}{Color.RESET}")
+    parser.read()
+    if not parser.can_fetch(USER_AGENT, url):
+        raise PermissionError(f"Access to {url} is disallowed by robots.txt")
 
 
 def fetch_content(url: str) -> bytes:
@@ -183,11 +180,9 @@ def scrape(
         content = fetch_content(url)
         soup = BeautifulSoup(content, "html.parser")
 
-        # Download images
         download_count = extract_images(url, soup, save_dir)
         print(f"{Color.INFO}Downloaded {download_count} images from {url}{Color.RESET}")
 
-        # Recursively scrape links
         if depth > 0:
             links = extract_links(url, soup, visited)
             for link in tqdm(links, desc="Processing links"):
@@ -198,12 +193,12 @@ def scrape(
 
 
 def main():
-    args = parse_arguments()
-    args.URL = validate_url(args.URL)
-    check_robots_txt(args.URL)
-    validate_save_path(args.path)
     print_header()
     try:
+        args = parse_arguments()
+        args.URL = validate_url(args.URL)
+        check_robots_txt(args.URL)
+        validate_save_path(args.path)
         scrape(
             url=args.URL,
             depth=args.level if args.recursive else 0,
@@ -213,6 +208,8 @@ def main():
         )
     except KeyboardInterrupt:
         print(f"{Color.WARNING}\nInterrupted by user.{Color.RESET}")
+    except Exception as e:
+        print(f"{Color.ERROR}Error: {e}{Color.RESET}")
     finally:
         print(f"{Color.SUCCESS}Total images downloaded: {total_downloads}{Color.RESET}")
 

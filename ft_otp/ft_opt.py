@@ -63,23 +63,34 @@ def parse_args() -> Args:
     group.required = True
     return parser.parse_args()
 
+def is_valid(key: str) -> bool:
+    try:
+        if (len(key) < 64):
+            return False
+        int(key, 16)
+        return True
+    except:
+        return False
+
 def generate_secret_key(key_file):
     try:
         with open(key_file, 'r') as file:
             content = file.read().strip()
             if not is_valid(content):
                 return
-        hashed = hashlib.sha1(contents.encode())
+        hashed = hashlib.sha1(content.encode())
         encoded = base64.b32encode(hashed.digest()).decode()
-        with open(KEY_FILE, "w") as file:
+        with open(key_file, "w") as file:
                 file.write(encoded)
         print("Key was saved in ft_opt.key")
+    except Exception as e:
+        print(f"{Color.ERROR}Error: {e}")
 
 def generate_opt(key_file):
         try:
             with open(key_file, 'r') as file:
-                secret = f.read()
-            secret_decoded = base64.b43decode(secret)
+                secret = file.read()
+            secret_decoded = base64.b32decode(secret)
 
             timestamp = time.time()
             N = int(timestamp // time_step)
