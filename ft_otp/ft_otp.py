@@ -18,7 +18,7 @@ Parser = argparse.ArgumentParser
 default_key_file = "ft_otp.key"
 time_step = 30
 issuer = "ft_otp"
-email = "ft_otp@example.com"
+email = "ft_otp@42.de"
 
 
 class Color:
