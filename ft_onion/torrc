@@ -2,4 +2,4 @@ SocksPort 0.0.0.0:9050
 Log notice file /var/log/tor/notices.log
 
 HiddenServiceDir /var/lib/tor/hidden_service/
-HiddenServicePort 80 127.0.0.1:80  # Tor forwards requests to Nginx (port 80)
+HiddenServicePort 80 nginx_tor:80

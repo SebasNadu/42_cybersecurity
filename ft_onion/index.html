@@ -4,9 +4,36 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Welcome to the Tor Web Server</title>
+    <style>
+      body {
+        color: #efefef;
+      }
+      .container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-color: #121212;
+        justify-content: center;
+        align-items: center;
+        background-image: url("https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg");
+        background-size: cover;
+      }
+
+      h1 {
+        padding: 0rem 4rem;
+        font-size: 4rem;
+      }
+
+      p {
+        font-size: 2rem;
+      }
+    </style>
   </head>
   <body>
-    <h1>Welcome to the Tor Web Server!</h1>
-    <p>This page is served through Tor.</p>
+    <div class="container">
+      <h1>Welcome to the Tor Web Server!</h1>
+      <p>This page is served through Tor.</p>
+    </div>
   </body>
 </html>
