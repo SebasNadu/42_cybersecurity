@@ -1,0 +1,6 @@
+Port 4242
+PermitRootLogin yes
+PasswordAuthentication yes
+ChallengeResponseAuthentication no
+UsePAM no
+Subsystem sftp /usr/lib/ssh/sftp-server

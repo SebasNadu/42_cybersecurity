@@ -3,37 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to the Tor Web Server</title>
+    <title>Welcome to ft_onion</title>
     <style>
       body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to bottom, #0a0a0a, #10151e, #172e3f);
         color: #efefef;
-      }
-      .container {
-        width: 100vw;
-        height: 100vh;
         display: flex;
-        flex-direction: column;
-        background-color: #121212;
         justify-content: center;
         align-items: center;
-        background-image: url("https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg");
-        background-size: cover;
+        height: 100vh;
+        text-align: center;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px 40px;
+        border-radius: 10px;
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
       }
 
       h1 {
-        padding: 0rem 4rem;
-        font-size: 4rem;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
 
       p {
-        font-size: 2rem;
+        font-size: 1.2rem;
+        line-height: 1.5;
+      }
+
+      footer {
+        margin-top: 20px;
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+
+      footer a {
+        color: #feaa00;
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>Welcome to the Tor Web Server!</h1>
-      <p>This page is served through Tor.</p>
+      <h1>Welcome to the ft_onion Web Server!</h1>
+      <p>This page is served through the Tor network.</p>
+      <footer>
+        <p>
+          Visit my Github
+          <a
+            href="https://www.github.com/SebasNadu"
+            target="_blank"
+            rel="noopener noreferrer"
+            >here!</a
+          >.
+        </p>
+      </footer>
     </div>
   </body>
 </html>
