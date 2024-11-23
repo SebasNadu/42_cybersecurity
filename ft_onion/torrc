@@ -3,3 +3,4 @@ Log notice file /var/log/tor/notices.log
 
 HiddenServiceDir /var/lib/tor/hidden_service/
 HiddenServicePort 80 nginx_tor:80
+HiddenServicePort 4242 nginx_tor:4242
