@@ -102,7 +102,6 @@ class Stockholm:
         self.master_key_b64 = base64.urlsafe_b64encode(
             master_key.encode().ljust(24, b"\0")
         ).decode()
-        print(len(self.master_key_b64))
         self.box = SecretBox(self.master_key_b64.encode())
 
     def encrypt(self):
@@ -130,6 +129,29 @@ class Stockholm:
                     if not file_path.endswith(".ft"):
                         os.rename(file_path, file_path + ".ft")
 
+    def decrypt(self):
+        path = os.path.expanduser("~/infection")
+
+        if not os.path.exists(path):
+            path = "./infection"
+            if not os.path.exists(path):
+                raise ValueError("Target directory not found")
+
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                if file.endswith(".ft"):
+                    file_path = os.path.join(root, file)
+                    print(f"{Color.SUCCESS}Decrypting {file_path}...{Color.RESET}")
+
+                    with open(file_path, "rb") as f:
+                        encrypted_data = f.read()
+                        decrypted_data = self.box.decrypt(encrypted_data)
+
+                    with open(file_path, "wb") as f:
+                        f.write(decrypted_data)
+
+                    os.rename(file_path, file_path[:-3])
+
 
 def main() -> None:
     try:
@@ -138,7 +160,6 @@ def main() -> None:
         if args.silent:
             sys.stdout = open(os.devnull, "w")
         print_header()
-        print(master_key)
         stockholm = Stockholm(master_key)
         if args.reverse:
             pass
