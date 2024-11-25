@@ -69,6 +69,10 @@ def get_master_key() -> str:
         return key
     load_dotenv("../.env")
     key = os.getenv("MASTER_KEY")
+    if key:
+        return key
+    load_dotenv("/root/.env")
+    key = os.getenv("MASTER_KEY")
     if not key:
         raise ValueError("MASTER_KEY not found in .env file")
     return key

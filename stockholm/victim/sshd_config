@@ -1,0 +1,5 @@
+PermitRootLogin yes  # Solo si realmente necesitas que root tenga acceso
+PasswordAuthentication yes
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+Subsystem sftp /usr/lib/ssh/sftp-server
