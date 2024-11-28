@@ -1,0 +1,46 @@
+services:
+  server:
+    container_name: ftp-server
+    image: panubo/vsftpd:latest
+    restart: unless-stopped
+    ports:
+      - "21:21"
+      - "21100-21110:21100-21110"
+    environment:
+      - FTP_USER=ftp_user
+      - FTP_PASSWORD=ftp_pass
+      - PASV_ADDRESS=ftp-server
+      - PASV_MIN_PORT=21100
+      - PASV_MAX_PORT=21110
+    volumes:
+      - ./volumes/server/:/srv
+    networks:
+      - inquisitor_network
+
+  client:
+    container_name: client
+    image: jlesage/filezilla
+    restart: unless-stopped
+    ports:
+      - "5800:5800"
+    volumes:
+      - ./volumes/storage:/storage:rw
+    networks:
+      - inquisitor_network
+
+  inquisitor:
+    container_name: inquisitor
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: inquisitor
+    ports:
+      - "2121:2121"
+    volumes:
+      - ./volumes/inquisitor/:/usr/inquisitor
+    networks:
+      - inquisitor_network
+
+networks:
+  inquisitor_network:
