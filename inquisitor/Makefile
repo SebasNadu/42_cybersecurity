@@ -11,7 +11,8 @@ RESET			="\033[m"
 BLUE			= \033[0;34m
 
 FOLDERS_TO_CPY      = ~/Downloads
-TARGET_DIR          = ./volumes/server/
+CLIENT_DIR					= ./volumes/client/
+SERVER_DIR          = ./volumes/server/
 
 all: copy_folders
 	@printf "${BLUE}Starting Docker containers...${NC}\n"
@@ -20,7 +21,7 @@ all: copy_folders
 copy_folders:
 	@printf "${YELLOW}Copying Download folder to server directory...${NC}\n"
 	@for folder in $(FOLDERS_TO_CPY); do \
-		cp -r $${folder/#\~/$${HOME}} $(TARGET_DIR); \
+		cp -r $${folder/#\~/$${HOME}} $(SERVER_DIR); \
 	done
 
 re: fclean all
@@ -34,13 +35,15 @@ down:
 	docker-compose down
 
 clean: down
-	@printf "${YELLOW}removing Docker containers, images, volumes, and networks stopped...${NC}\n"
+	@printf "${YELLOW}removing Docker containers, images, and networks stopped...${NC}\n"
 	 docker system prune -f -a
 
 fclean: down
-	@printf "${YELLOW}Cleaning volumes/server directory...${NC}\n"
-	@rm -rf $(TARGET_DIR)*
-	@touch ./volumes/server/.gitkeep
+	@printf "${YELLOW}Cleaning volumes/server volumes/client directories...${NC}\n"
+	@rm -rf $(SERVER_DIR)*
+	@touch $(SERVER_DIR).gitkeep
+	@rm -rf $(CLIENT_DIR)*
+	@touch $(CLIENT_DIR).gitkeep
 	@printf "${YELLOW}removing All Docker containers, images, volumes, and networks...${NC}\n"
 	docker system prune -f -a --volumes
 
